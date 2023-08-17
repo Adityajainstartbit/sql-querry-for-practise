@@ -1,0 +1,123 @@
+1 ---Find Orders between 1st August to 10th August with order value greater then 500 and customer belongs to Jaipur City.
+  querrry
+SELECT order_details.*
+FROM order_details
+JOIN customers ON order_details.customer_id = customers.id
+JOIN customer_details ON customers.id = customer_details.customer_id
+WHERE order_details.total_amount > 500
+AND order_details.created_at BETWEEN '2023-08-01' AND '2023-08-10'
+ AND customer_details.customer_city = 'jaipur';
+2---------Find those products which have price in the range of 200-600 and inventory quantity is less then 100.
+select * from productdetails
+where price BETWEEN 20 and 50 and inventory >50
+3---------------Find Sold products from orders and line items join them with their vendor and sold quantity.
+SELECT productdetails.id AS product_id,
+       productdetails.product_title,
+       vendors.id AS vendor_id,
+       vendors.first_name AS vendor_name,
+       SUM(line_items.quantity) AS total_sell_quantity
+FROM productdetails
+JOIN line_items ON productdetails.id = line_items.productdetail_id
+JOIN order_details ON line_items.order_detail_id = order_details.id
+JOIN customers ON order_details.customer_id = customers.id
+JOIN vendors ON productdetails.vendor_id = vendors.id
+WHERE order_details.status = true
+GROUP BY productdetails.id, vendors.id;
+4---------Write an SQL query  to find all products that are sold to those customers which belongs to  country India.
+SELECT *
+FROM productdetails
+JOIN line_items ON productdetails.id = line_items.productdetail_id
+JOIN order_details ON line_items.order_detail_id = order_details.id
+JOIN customers ON order_details.customer_id = customers.id
+JOIN customer_details ON customers.id = customer_details.customer_id 
+WHERE order_details.status = true AND customer_details.customer_country = 'india'; 
+5---------------------Write an SQL  to to find average value of orders join them with the customers.
+SELECT customers.*, 
+	   customer_details.*,
+	   AVG(order_details.total_amount) AS average_order_amount
+FROM customers
+JOIN order_details ON customers.id = order_details.customer_id
+JOIN customer_details ON customers.id = customer_details.customer_id
+GROUP BY customers.id,customer_details.id, customer_details.customer_name;
+6--------------------Write an sql query and rails query to find order placed on dates[2nd, 3rd, 5th and 10th August] order by id ASC
+Select * from order_details
+where DATE(created_at)  IN ('2023-08-02', '2023-08-03', '2023-08-05', '2023-08-10')
+order by id asc;
+7-------------- I have almost 1M records in which I need to update its Product name against each ID with product table.
+----For performing this you need to add 1M data in the table by using faker gem or any other tool as you like. Then need to perform update operation.
+UPDATE "productdetails"
+SET "status" = 'active'
+WHERE "productdetails.4
+status" = 'inactive'
+8----------------------------. Now delete those 1M records in single SQL statement and rails query. You need to take care of execution time and make sure it gets done in minimum time.
+DELETE FROM "records"
+9-------------From the Customers table, write a SQL query and Rails Query to find all the duplicate emails (no upper case letters) of the customers. Return email id.
+QUERRY DATE 15 AUGUST
+SELECT LOWER(email) AS email
+FROM customers
+GROUP BY LOWER(email)
+HAVING COUNT(*) > 1;
+10-------------- From the order_details tables, write a SQL query  to find the top 10 Vendors that have made highest sale. Return their names and total sale order amount.
+SELECT
+  vendors.company_name AS vendor_name,
+  SUM(od.total_amount) AS total_sale_amount
+FROM
+  vendors 
+JOIN
+  productdetails pd ON pd.vendor_id = vendors.id
+JOIN
+  line_items li ON li.productdetail_id = pd.id
+JOIN
+  order_details od ON od.id = li.order_detail_id
+GROUP BY
+  vendors.id, vendors.company_name
+ORDER BY
+  total_sale_amount DESC
+LIMIT
+  10;
+11------------ Write a SQL query  to find those items/products, which have ordered 5 or more times and min order value should be greater then RS100. Return item name, number of orders, customer name, customer city, order id.
+SELECT
+    pd.product_title,
+    cd.customer_name,
+    cd.customer_city,
+    COUNT(DISTINCT od.id) AS number_of_orders
+FROM
+    customer_details cd
+INNER JOIN customers c ON cd.customer_id = c.id
+INNER JOIN order_details od ON c.id = od.customer_id
+INNER JOIN line_items li ON od.id = li.order_detail_id
+INNER JOIN productdetails pd ON li.productdetail_id = pd.id
+WHERE
+    od.total_amount > 100
+GROUP BY
+    pd.product_title,
+    cd.customer_name,
+    cd.customer_city,
+    li.productdetail_id
+HAVING
+    COUNT(DISTINCT od.id) >= 5;
+12----------------- Write a SQL query  to combine each row of the Vendor table with each row of the product table.
+SELECT v.company_name,v.company_name,v.email, v.address,pd.*
+FROM productdetails pd
+JOIN vendors v ON pd.vendor_id = v.id
+LIMIT 10000;
+SELECT v.company_name, pd.*
+FROM productdetails pd
+JOIN vendors v ON pd.vendor_id = v.id
+LIMIT 10000;
+13---------- Write a SQL statement to generate a report with the customer name, city, order no. order date, purchase amount, Vendor name for only those customers on the list who must have from these cities of india(Delhi, Mumbai, Kota, Udaipur, Goa) and placed one or more orders
+SELECT customer_details.customer_name,
+       customer_details.customer_city,
+       order_details.order_number,
+       DATE(order_details.created_at) as order_date,
+       order_details.total_amount,
+       vendors.first_name
+FROM order_details
+JOIN customers ON order_details.customer_id = customers.id
+JOIN customer_details ON customers.id = customer_details.customer_id 
+JOIN line_items ON line_items.order_detail_id = order_details.id
+JOIN productdetails ON line_items.productdetail_id = productdetails.id
+JOIN vendors ON productdetails.vendor_id = vendors.id
+WHERE customer_details.customer_city IN ('Delhi', 'Mumbai', 'Kota', 'Udaipur', 'Goa')
+GROUP BY customer_details.customer_name, customer_details.customer_city, order_details.order_number, order_details.created_at, order_details.total_amount, vendors.first_name
+HAVING COUNT(DISTINCT order_details.id) >= 1;
