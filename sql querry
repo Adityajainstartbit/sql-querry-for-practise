@@ -121,3 +121,54 @@ JOIN vendors ON productdetails.vendor_id = vendors.id
 WHERE customer_details.customer_city IN ('Delhi', 'Mumbai', 'Kota', 'Udaipur', 'Goa')
 GROUP BY customer_details.customer_name, customer_details.customer_city, order_details.order_number, order_details.created_at, order_details.total_amount, vendors.first_name
 HAVING COUNT(DISTINCT order_details.id) >= 1;
+--------------------------Write a query in SQL and Rails to retrieve the number of customers for each City. Return city and number of customer. Sort the result in ascending order on city.
+  SELECT
+  customer_details.customer_city,
+  COUNT(*) AS number_of_customers
+FROM
+  customer_details
+GROUP BY
+  customer_city
+ORDER BY
+  customer_city ASC;
+----------------------- Write a query in SQL and Rails to retrieve the total sales for each year. Filter the result set for those orders where order year is on or after 2016. Return the year part of orderdate and total order amount. Sort the result in ascending order on year part of order date
+SELECT EXTRACT(YEAR FROM created_at) AS order_year, SUM(total_amount) AS total_amount
+FROM order_details
+WHERE EXTRACT(YEAR FROM created_at) >= 2016
+GROUP BY order_year
+Order BY order_year asc
+----------------Write a query in SQL and Rails to find the average and the sum of the subtotal for every customer based on the placed order value. Return customer_id, average and sum of the subtotal. Grouped the result on customer_id and vendor_id. Sort the result on customer_id column in descending order.
+SELECT
+    customers.id,
+   
+    AVG(order_details.total_amount) AS averageSubtotal,
+    SUM(order_details.total_amount) AS totalSubtotal
+FROM
+    order_details
+	JOIN 
+    customers ON order_details.customer_id = customers.id
+
+	
+GROUP BY
+    customers.id
+  
+ORDER BY
+    customers.id DESC;
+-------------------------- Write a query in SQL and Rails to find the sum of the quantity with order value for each location of the customers. Group the results for all combination of distinct location of customers(City) with order quantity, order amount. Rolls up the results into order total. Return location city, country, customer name.
+SELECT
+    SUM(line_items.quantity) AS total_quantity,
+    SUM(order_details.total_amount) AS total_order_amount,
+    customer_details.customer_city,
+	customer_details.customer_name,
+	customer_details.customer_country
+FROM
+    order_details
+JOIN
+    line_items ON line_items.order_detail_id = order_details.id
+JOIN
+    customers ON order_details.customer_id = customers.id
+JOIN
+    customer_details ON customers.id = customer_details.customer_id
+GROUP BY
+ customer_details.customer_city, customer_details.customer_country,customer_details.customer_name;
+------------- end for now
