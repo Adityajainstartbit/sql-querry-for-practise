@@ -1,0 +1,19 @@
+Date. 18-8-2023
+Usefull gem for optimizing the database and a load time for rails active record
+
+1 bullet gem : I use this gem to find eager loading for the  database   it timely tell you when a querry  taking a long loop and i gone it sequence by the use for includes and other function like find_ each all and a destroy all it mainly focous on minimum time of querry to take load and minimum number of querry
+------------------------------------------------------------------------------------------
+2.gem faker: this gem is very usefull for create a bulk amount of data in a database i use this to import 1 Million product database
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+3. gem active_to _index: this gem it help full for indexing feature indexing help us to optimize load time and filter for the database
+---------------------------------------------------------------------------------------------------------------------------------------
+
+4.gem lol_dba:  this gem i use for the application it is efficient but it increase a load time and make the productivity low but it help full to use when dealing with small number of productdetails use for find indexes and fix column
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+5. gem pry: it  is very usefull to make a new console where u can load large number of dataset this console help you out to write querry with minimum amount of time  to find productdetails from the console avoid system stuck 
+
+
