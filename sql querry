@@ -171,4 +171,65 @@ JOIN
     customer_details ON customers.id = customer_details.customer_id
 GROUP BY
  customer_details.customer_city, customer_details.customer_country,customer_details.customer_name;
-------------- end for now
+------------- 
+-----------Write a SQL query and Rails Query to find the highest purchase with its corresponding item for each customer. In case of a same quantity purchase find the item which is of high price.
+-------The output must be sorted by increasing of customer_id. Return customer ID,highest item price and purchase quantity.
+SELECT
+    customers.id AS customer_id,
+    MAX(productdetails.price) AS highest_item_price,
+    line_items.quantity AS purchase_quantity
+FROM
+    customers
+JOIN line_items ON line_items.customer_id = customers.id
+JOIN productdetails ON productdetails.id = line_items.productdetail_id
+WHERE
+    (line_items.quantity, productdetails.price) IN (
+        SELECT
+            MAX(li.quantity), MAX(pd.price)
+        FROM
+            line_items li
+        JOIN productdetails pd ON pd.id = li.productdetail_id
+        WHERE
+            li.customer_id = customers.id
+        GROUP BY
+            li.customer_id
+    )
+GROUP BY
+    customers.id, line_items.quantity
+ORDER BY
+    customers.id;
+------------- Write a SQL query and Rails query to make a report such that there is a product id column and a sale quantity column for each quarter of 2022. Return product ID and sale quantity of each quarter.
+SELECT
+    p.id AS product_id,
+    EXTRACT(QUARTER FROM od.created_at) AS quarter,
+    SUM(li.quantity) AS sale_quantity
+FROM
+    productdetails p
+JOIN
+    line_items li ON p.id = li.productdetail_id
+JOIN
+    order_details od ON li.order_detail_id = od.id
+WHERE
+    od.created_at >= '2022-01-01' AND od.created_at < '2023-01-01'
+GROUP BY
+    p.id, quarter
+ORDER BY
+    p.id, quarter;
+----------------------------------------------------------Write a SQL query and Rails Query to find the number of orders placed from each country in year 2022. Return order Id, city name, no of orders and year.
+SELECT
+    cd.customer_city,
+    COUNT(o.id) AS number_of_orders,
+	 EXTRACT(YEAR FROM o.created_at), 
+	 cd.customer_country
+FROM
+    order_details o
+JOIN
+    customers cu ON o.customer_id = cu.id
+JOIN
+    customer_details cd ON cu.id = cd.customer_id
+WHERE
+    EXTRACT(YEAR FROM o.created_at) = 2022
+GROUP BY
+    	 cd.customer_country, EXTRACT(YEAR FROM o.created_at),cd.customer_city;
+------------------end for now
+
